@@ -1,0 +1,13 @@
+# Dependencies
+/node_modules
+/vendor
+
+# Rust
+/target
+
+# Go
+/bin
+
+# Environment variables
+.env
+*.env
