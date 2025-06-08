@@ -50,9 +50,11 @@ function App() {
 }
 
 const WrappedApp = () => (
-  <ApolloProvider client={client}>
-    <App />
-  </ApolloProvider>
+  <div className="App">
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
+  </div>
 );
 
 export default WrappedApp;

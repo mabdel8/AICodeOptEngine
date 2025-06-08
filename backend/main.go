@@ -20,7 +20,7 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootMutation",
 	Fields: graphql.Fields{
 		"submitCode": &graphql.Field{
-			Type: graphql.Int,
+			Type: graphql.String,
 			Args: graphql.FieldConfigArgument{
 				"code": &graphql.ArgumentConfig{
 					Type: graphql.NewNonNull(graphql.String),
