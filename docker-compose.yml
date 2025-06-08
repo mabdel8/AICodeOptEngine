@@ -5,8 +5,6 @@ services:
     build: ./backend
     ports:
       - "8080:8080"
-    volumes:
-      - ./backend:/app
     depends_on:
       - vector-db
 
@@ -14,15 +12,11 @@ services:
     build: ./rust-service
     ports:
       - "8081:8081"
-    volumes:
-      - ./rust-service:/app
 
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app
     depends_on:
       - backend
 

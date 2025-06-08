@@ -8,6 +8,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
+	"github.com/rs/cors"
 )
 
 type RustAnalyzeResponse struct {
@@ -92,7 +93,13 @@ func main() {
 		GraphiQL: true,
 	})
 
-	http.Handle("/graphql", h)
+	// Add CORS middleware
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowCredentials: true,
+	})
+
+	http.Handle("/graphql", c.Handler(h))
 
 	log.Println("Server started at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
