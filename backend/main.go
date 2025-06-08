@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
 )
 
 type RustAnalyzeResponse struct {
@@ -85,18 +87,14 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-		result := graphql.Do(graphql.Params{
-			Schema:        schema,
-			RequestString: r.URL.Query().Get("query"),
-		})
-		json.NewEncoder(w).Encode(result)
+	h := handler.New(&handler.Config{
+		Schema:   &schema,
+		Pretty:   true,
+		GraphiQL: true,
 	})
 
-	log.Println("Configuring server...")
-	server := &http.Server{Addr: ":8080"}
-	log.Println("Server configured. Starting...")
-	if err := server.ListenAndServe(); err != nil {
-		panic(err)
-	}
+	http.Handle("/graphql", h)
+
+	log.Println("Server started at http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 } 
