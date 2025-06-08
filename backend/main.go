@@ -57,24 +57,32 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var schema, _ = graphql.NewSchema(
-	graphql.SchemaConfig{
-		Query: graphql.NewObject(
-			graphql.ObjectConfig{
-				Name: "Query",
-				Fields: graphql.Fields{
-					"hello": &graphql.Field{
-						Type: graphql.String,
-						Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-							return "world", nil
+var schema graphql.Schema
+
+func init() {
+	var err error
+	schema, err = graphql.NewSchema(
+		graphql.SchemaConfig{
+			Query: graphql.NewObject(
+				graphql.ObjectConfig{
+					Name: "Query",
+					Fields: graphql.Fields{
+						"hello": &graphql.Field{
+							Type: graphql.String,
+							Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+								return "world", nil
+							},
 						},
 					},
 				},
-			},
-		),
-		Mutation: rootMutation,
-	},
-)
+			),
+			Mutation: rootMutation,
+		},
+	)
+	if err != nil {
+		log.Fatalf("failed to create schema, error: %v", err)
+	}
+}
 
 func main() {
 	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
@@ -85,6 +93,10 @@ func main() {
 		json.NewEncoder(w).Encode(result)
 	})
 
-	log.Println("Server started at http://localhost:8080/graphql")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Configuring server...")
+	server := &http.Server{Addr: ":8080"}
+	log.Println("Server configured. Starting...")
+	if err := server.ListenAndServe(); err != nil {
+		panic(err)
+	}
 } 
