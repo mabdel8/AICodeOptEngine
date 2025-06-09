@@ -5,18 +5,23 @@ services:
     build: ./backend
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     depends_on:
+      - rust-service
       - vector-db
 
   rust-service:
     build: ./rust-service
     ports:
       - "8081:8081"
+    env_file:
+      - .env
 
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
 
@@ -24,5 +29,6 @@ services:
     image: qdrant/qdrant:latest
     ports:
       - "6333:6333"
+      - "6334:6334"
     volumes:
       - ./qdrant_storage:/qdrant/storage

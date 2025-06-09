@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation, gql, ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { useMutation, gql, ApolloClient, InMemoryCache, ApolloProvider, useLazyQuery } from '@apollo/client';
 
 const client = new ApolloClient({
   uri: 'http://localhost:8080/graphql',
@@ -11,6 +11,54 @@ const SUBMIT_CODE_MUTATION = gql`
     submitCode(code: $code)
   }
 `;
+
+const GET_SIMILAR_CODE_QUERY = gql`
+  query GetSimilarCode($code: String!) {
+    getSimilarCode(code: $code)
+  }
+`;
+
+function SimilarCodeFinder() {
+  const [requestCode, setRequestCode] = useState('');
+  const [getSimilarCode, { data, loading, error }] = useLazyQuery(GET_SIMILAR_CODE_QUERY);
+
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    getSimilarCode({ variables: { code: requestCode } });
+  };
+
+  return (
+    <div style={{ marginTop: '40px' }}>
+      <hr />
+      <h2>Find Similar Code</h2>
+      <form onSubmit={handleSearch}>
+        <textarea
+          rows={10}
+          cols={80}
+          value={requestCode}
+          onChange={(e) => setRequestCode(e.target.value)}
+          placeholder="Paste code here to find similar snippets..."
+        />
+        <br />
+        <button type="submit" disabled={loading}>
+          {loading ? 'Searching...' : 'Find Similar'}
+        </button>
+      </form>
+
+      {error && <p>Error finding similar code: {error.message}</p>}
+      {data && data.getSimilarCode && (
+        <div>
+          <h3>Similar Code Snippets:</h3>
+          {data.getSimilarCode.map((snippet: string, index: number) => (
+            <pre key={index} style={{ border: '1px solid #ccc', padding: '10px', marginTop: '10px' }}>
+              <code>{snippet}</code>
+            </pre>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function App() {
   const [code, setCode] = useState('');
@@ -42,9 +90,13 @@ function App() {
       {data && (
         <div>
           <h2>Analysis Results:</h2>
-          <p>Line Count: {data.submitCode}</p>
+          <pre>
+            <code>{data.submitCode}</code>
+          </pre>
         </div>
       )}
+
+      <SimilarCodeFinder />
     </div>
   );
 }

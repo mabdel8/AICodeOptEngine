@@ -11,3 +11,10 @@
 # Environment variables
 .env
 *.env
+
+# Additional files
+/build
+/coverage
+.vscode
+.idea
+/qdrant_storage
